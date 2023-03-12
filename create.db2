@@ -34,8 +34,7 @@ CREATE TABLE doctor(
   city VARCHAR(25) NOT NULL,
   state CHAR(2) NOT NULL,
   zip CHAR(5) NOT NULL,
-  ssn CHAR(9) NOT NULL UNIQUE,
-  occupation VARCHAR(25) NOT NULL);
+  ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE nurse(
   nurse_id CHAR(10) NOT NULL PRIMARY KEY,
@@ -54,8 +53,7 @@ CREATE TABLE nurse(
   city VARCHAR(25) NOT NULL,
   state CHAR(2) NOT NULL,
   zip CHAR(5) NOT NULL,
-  ssn CHAR(9) NOT NULL UNIQUE,
-  occupation VARCHAR(25) NOT NULL);
+  ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE secretary(
   secretary_id CHAR(10) NOT NULL PRIMARY KEY,
@@ -72,8 +70,7 @@ CREATE TABLE secretary(
   city VARCHAR(25) NOT NULL,
   state CHAR(2) NOT NULL,
   zip CHAR(5) NOT NULL,
-  ssn CHAR(9) NOT NULL UNIQUE,
-  occupation VARCHAR(25) NOT NULL);
+  ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE patient(
   patient_id CHAR(10) NOT NULL PRIMARY KEY,
