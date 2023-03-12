@@ -8,10 +8,23 @@
 	 (2) Non-existent middle names will be denoted as empty strings, not NULL or
 	 "NMN"
 */
+CREATE TABLE member(
+  id CHAR(10) NOT NULL PRIMARY KEY,
+  first_name VARCHAR(25) NOT NULL,
+  middle_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  sex CHAR(1) NOT NULL CHECK(
+    sex = 'M'
+    OR sex = 'F'),
+  dob DATE NOT NULL,
+  street_address VARCHAR(25) NOT NULL,
+  city VARCHAR(25) NOT NULL,
+  stateAb CHAR(2) NOT NULL,
+  zip CHAR(5) NOT NULL);
 
 CREATE TABLE department(
   dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
-  head CHAR(10));
+  head CHAR(10) references member);
 	-- ^ Not sure how to implement head:
   -- (1) It should be an FK to an employee's ID, such that if the
   --     employee is fired, then the department.head entry is
@@ -20,76 +33,29 @@ CREATE TABLE department(
   --     email_address.id*
 
 CREATE TABLE doctor(
-  doctor_id CHAR(10) NOT NULL PRIMARY KEY,
-  alma_mater VARCHAR(50),
+  doctor_id CHAR(10) NOT NULL PRIMARY KEY references member,
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
-  first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
-  sex CHAR(1) NOT NULL CHECK(
-    sex = 'M'
-    OR sex = 'F'),
-  dob DATE NOT NULL,
-  street_address VARCHAR(25) NOT NULL,
-  city VARCHAR(25) NOT NULL,
-  state CHAR(2) NOT NULL,
-  zip CHAR(5) NOT NULL,
+  alma_mater VARCHAR(50),
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE nurse(
-  nurse_id CHAR(10) NOT NULL PRIMARY KEY,
-  
+  nurse_id CHAR(10) NOT NULL PRIMARY KEY references member,
   /* Refer to link at the bottom of this file for the level_of_education codes */
   level_of_education SMALLINT NOT NULL CHECK(level_of_education BETWEEN 0 AND 22),
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
-  first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
-  sex CHAR(1) NOT NULL CHECK(
-    sex = 'M'
-    OR sex = 'F'),
-  dob DATE NOT NULL,
-  street_address VARCHAR(25) NOT NULL,
-  city VARCHAR(25) NOT NULL,
-  state CHAR(2) NOT NULL,
-  zip CHAR(5) NOT NULL,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE secretary(
-  secretary_id CHAR(10) NOT NULL PRIMARY KEY,
+  secretary_id CHAR(10) NOT NULL PRIMARY KEY references member,
   is_senior BOOLEAN NOT NULL,
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
-  first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
-  sex CHAR(1) NOT NULL CHECK(
-    sex = 'M'
-    OR sex = 'F'),
-  dob DATE NOT NULL,
-  street_address VARCHAR(25) NOT NULL,
-  city VARCHAR(25) NOT NULL,
-  state CHAR(2) NOT NULL,
-  zip CHAR(5) NOT NULL,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE patient(
-  patient_id CHAR(10) NOT NULL PRIMARY KEY,
-  first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25) NOT NULL,
-  last_name VARCHAR(50) NOT NULL,
-  sex CHAR(1) NOT NULL CHECK(
-    sex = 'M'
-    OR sex = 'F'),
-  dob DATE NOT NULL,
-  street_address VARCHAR(25) NOT NULL,
-  city VARCHAR(25) NOT NULL,
-  state CHAR(2) NOT NULL,
-  zip CHAR(5) NOT NULL,
-  
+  patient_id CHAR(10) NOT NULL PRIMARY KEY references member,
   /* Undocumented patients will have the SSN of 000-00-0000, hence this is not a
      candidate key by default for person_type. */
   ssn CHAR(9) NOT NULL,
-  height SMALLINT CHECK(height BETWEEN 0 AND 300),
   blood_group VARCHAR(3) NOT NULL CHECK(
     blood_group IN ('A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-')));
 
@@ -125,9 +91,8 @@ CREATE TABLE visit(
   PRIMARY KEY (patient_id, datetime_in));
   
 CREATE TABLE phone_number(
-  id CHAR(10) NOT NULL,           -- Not sure how to make this an FK to multiple  
-  type VARCHAR(6) NOT NULL CHECK( -- possible employee/patient tables. The same
-                                  -- issue applies to the table below
+  id CHAR(10) NOT NULL references member,
+  type VARCHAR(6) NOT NULL CHECK(
     type IN ('MOBILE', 'HOME', 'WORK', 'SCHOOL', 'MAIN')), 
   availability VARCHAR(10) CHECK(
     availability IN ('MORNING', 'AFTERNOON', 'EVENING', 'ON-CALL')
@@ -136,7 +101,7 @@ CREATE TABLE phone_number(
   PRIMARY KEY (id, number));
 	
 CREATE TABLE email_address(  
-  id CHAR(10) NOT NULL,
+  id CHAR(10) NOT NULL references member,
   email VARCHAR(345) NOT NULL CHECK(
   
   /* This will ensure that emails have at least one character before the "@,"
