@@ -11,12 +11,13 @@
 
 CREATE TABLE department(
   dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
-  head CHAR(10)); -- Not sure how to implement this one:
-                  -- (1) It should be an FK to an employee's ID, such that if the
-                  --     employee is fired, then the department.head entry is
-                  --     deleted
-                  -- (2) It has the same issue as phone_number.id and
-                  --     email_address.id*
+  head CHAR(10));
+	-- ^ Not sure how to implement head:
+  -- (1) It should be an FK to an employee's ID, such that if the
+  --     employee is fired, then the department.head entry is
+  --     deleted
+  -- (2) It has the same issue as phone_number.id and
+  --     email_address.id*
 
 CREATE TABLE doctor(
   doctor_id CHAR(10) NOT NULL PRIMARY KEY,
@@ -91,7 +92,7 @@ CREATE TABLE patient(
   /* Undocumented patients will have the SSN of 000-00-0000, hence this is not a
      candidate key by default for person_type. */
   ssn CHAR(9) NOT NULL,
-  height_in_cm SMALLINT CHECK(height_in_cm BETWEEN 0 AND 300),
+  height SMALLINT CHECK(height BETWEEN 0 AND 300),
   blood_group VARCHAR(3) NOT NULL CHECK(
     blood_group IN ('A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-')));
 
@@ -104,13 +105,28 @@ CREATE TABLE visit(
                                         -- requires this attribute to be NULL,
                                         -- until the visit is over with.
                                         
-  /* Whether or not the following five attributes are jotted down varies by
+  /* Whether or not the following six attributes are jotted down varies by
      visit, and reason for visit, hence NULLs are welcome */
   notes VARCHAR(30000),
-  blood_pressure SMALLINT,
-  heart_rate SMALLINT,
-  temperature DECIMAL(4, 1),
-  oxygen_level DECIMAL(3, 2),
+
+  /* To save time typing  when using this database, the official abbreviations for
+	   the following have been used, respectively: systolic blood pressure,
+		 diastolic BP, heart rate, temperature, and oxygen level */
+  sbp SMALLINT CHECK(
+	  sbp BETWEEN 0 AND 200
+		OR sbp IS NULL),
+	dbp SMALLINT CHECK(
+	  dbp BETWEEN 0 AND 150
+		OR dbp IS NULL),
+  hr SMALLINT CHECK(
+	  hr BETWEEN 0 AND 250
+		OR hr IS NULL),
+  t DECIMAL(4, 1) CHECK(
+	  t BETWEEN 75 AND 125
+		OR t IS NULL),
+  sp_o2 DECIMAL(3, 2) CHECK(
+	  sp_o2 BETWEEN 0.00 AND 1.00
+		OR sp_o2 IS NULL),
   PRIMARY KEY (patient_id, datetime_in));
   
 CREATE TABLE phone_number(
@@ -122,9 +138,12 @@ CREATE TABLE phone_number(
     availability IN ('MORNING', 'AFTERNOON', 'EVENING', 'ON-CALL')
     OR availability IS NULL),
   number CHAR(10) NOT NULL,
-  PRIMARY KEY (id, number)); -- I assume this should be the PK, although the 
-                             -- schema diagram did not specify it. Ditto for the
-CREATE TABLE email_address(  -- table below
+  PRIMARY KEY (id, number));
+	-- ^ I assume this should be the PK, although the 
+  -- schema diagram did not specify it. Ditto for the
+	-- table below
+	
+CREATE TABLE email_address(  
   id CHAR(10) NOT NULL,
   email VARCHAR(345) NOT NULL CHECK(
   
@@ -138,5 +157,5 @@ CREATE TABLE email_address(  -- table below
 
 /***********************************APPENDIX**************************************
 Easy codes to categorize nurse.level_of_education:
-https://help.nfc.usda.gov/publications/EPICWEB/6592.htm#:~:text=Education%20Level%20Table%20%20%20%20Code%20,graduate.%20Hig%20...%20%2019%20more%20rows%20
+-- https://help.nfc.usda.gov/publications/EPICWEB/6592.htm#:~:text=Education%20Level%20Table%20%20%20%20Code%20,graduate.%20Hig%20...%20%2019%20more%20rows%20
 */
