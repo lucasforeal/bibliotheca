@@ -99,11 +99,9 @@ CREATE TABLE patient(
 CREATE TABLE visit(
   patient_id CHAR (10) NOT NULL REFERENCES patient,
   datetime_in TIMESTAMP NOT NULL,
-  datetime_out TIMESTAMP,               -- Is this the projected datetime_out or
-  doctor_id CHAR(10) REFERENCES doctor, -- the actual one? The latter case 
-  nurse_id CHAR(10) NOT NULL REFERENCES nurse,   
-                                        -- requires this attribute to be NULL,
-                                        -- until the visit is over with.
+  datetime_out TIMESTAMP NOT NULL,
+  doctor_id CHAR(10) REFERENCES doctor,
+  nurse_id CHAR(10) NOT NULL REFERENCES nurse,
                                         
   /* Whether or not the following six attributes are jotted down varies by
      visit, and reason for visit, hence NULLs are welcome */
@@ -139,9 +137,6 @@ CREATE TABLE phone_number(
     OR availability IS NULL),
   number CHAR(10) NOT NULL,
   PRIMARY KEY (id, number));
-	-- ^ I assume this should be the PK, although the 
-  -- schema diagram did not specify it. Ditto for the
-	-- table below
 	
 CREATE TABLE email_address(  
   id CHAR(10) NOT NULL,
