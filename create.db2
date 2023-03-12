@@ -150,8 +150,11 @@ table they're part of
 */
 CREATE VIEW patient_view AS(
   SELECT *
-	FROM patient JOIN visit
+	FROM patient as p JOIN visit as v
+	ON p.patient_id = v.patient_id
 	WHERE patient_id = CURRENT USER);
+
+
 
 /***********************************APPENDIX**************************************
 Easy codes to categorize nurse.level_of_education:
