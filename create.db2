@@ -1,8 +1,13 @@
-/* Assumption when using VARCHAR throughout: our database uses UTF-8 to store
+/*********************************CREATING TABLES********************************/
+/* Two notes:
+   (1) Assumption when using VARCHAR throughout: our database uses UTF-8 to store
    characters (otherwise the specified number of VARCHAR bytes would not equate 
    the number of characters. I.e. VARCHAR(50) lets department.dept_name be up to 
    10 characters long, but if the database did not use UTF-8, the maximum number 
-   of characters could be lesser) */
+   of characters could be lesser)
+	 (2) Non-existent middle names will be denoted as empty strings, not NULL or
+	 "NMN"
+*/
 
 CREATE TABLE department(
   dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
@@ -18,8 +23,8 @@ CREATE TABLE doctor(
   alma_mater VARCHAR(50),
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25),         -- What would we rather have for people w/o
-  last_name VARCHAR(50) NOT NULL,  -- middle names NULL, or NMI?
+  middle_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
   sex CHAR(1) NOT NULL CHECK(
     sex = 'M'
     OR sex = 'F'),
@@ -34,12 +39,12 @@ CREATE TABLE doctor(
 CREATE TABLE nurse(
   nurse_id CHAR(10) NOT NULL PRIMARY KEY,
   
-  /* Refer to link at the bottom of this file for level_of_education codes */
-  level_of_education CHAR(2) NOT NULL,
+  /* Refer to link at the bottom of this file for the level_of_education codes */
+  level_of_education SMALLINT NOT NULL CHECK(level_of_education BETWEEN 0 AND 22),
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25),         -- What would we rather have for people w/o
-  last_name VARCHAR(50) NOT NULL,  -- middle names NULL, or NMI?
+  middle_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
   sex CHAR(1) NOT NULL CHECK(
     sex = 'M'
     OR sex = 'F'),
@@ -56,8 +61,8 @@ CREATE TABLE secretary(
   is_senior BOOLEAN NOT NULL,
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25),         -- What would we rather have for people w/o
-  last_name VARCHAR(50) NOT NULL,  -- middle names NULL, or NMI?
+  middle_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
   sex CHAR(1) NOT NULL CHECK(
     sex = 'M'
     OR sex = 'F'),
@@ -72,8 +77,8 @@ CREATE TABLE secretary(
 CREATE TABLE patient(
   patient_id CHAR(10) NOT NULL PRIMARY KEY,
   first_name VARCHAR(25) NOT NULL,
-  middle_name VARCHAR(25),         -- What would we rather have for people w/o
-  last_name VARCHAR(50) NOT NULL,  -- middle names NULL, or NMI?
+  middle_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
   sex CHAR(1) NOT NULL CHECK(
     sex = 'M'
     OR sex = 'F'),
@@ -127,9 +132,11 @@ CREATE TABLE email_address(  -- table below
      and at least two characters before and after the "." */
     email LIKE '%_@__%.__%'),
   PRIMARY KEY (id, email));
-  
-/*
-Easy codes to categorize nurse.level_of_education:
 
-https://help.nfc.usda.gov/publications/EPICWEB/:~:text=Education%20Level%20Table%20%20%20%20Code%20,graduate.%20Hig%20...%20%2019%20more%20rows
+/********************************CREATING VIEWS**********************************/
+
+
+/***********************************APPENDIX**************************************
+Easy codes to categorize nurse.level_of_education:
+https://help.nfc.usda.gov/publications/EPICWEB/6592.htm#:~:text=Education%20Level%20Table%20%20%20%20Code%20,graduate.%20Hig%20...%20%2019%20more%20rows%20
 */
