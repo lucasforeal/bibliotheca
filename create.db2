@@ -29,7 +29,7 @@ CREATE TABLE department(
   /* Ensure department head is not a patient */
     head NOT IN (
       SELECT DISTINCT patient_id
-      FROM patient);
+      FROM patient)));
 
 CREATE TABLE doctor(
   doctor_id CHAR(10) NOT NULL PRIMARY KEY references member,
