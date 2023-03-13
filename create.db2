@@ -108,16 +108,8 @@ CREATE TABLE email_address(
     email LIKE '%_@__%.__%'),
   PRIMARY KEY (id, email));
 
-/********************************CREATING VIEWS**********************************
-These views will assume the Db2's user name is the same as their id in whichever
-table they're part of
-*/
-CREATE VIEW patient_view AS(
-  SELECT *
-	FROM patient as p JOIN visit as v
-	ON p.patient_id = v.patient_id
-	WHERE p.patient_id = CURRENT USER);
-  
+/********************************CREATING VIEWS**********************************/
+
 
 
 /***********************************APPENDIX**************************************
