@@ -62,7 +62,7 @@ CREATE TABLE visit(
   patient_id CHAR (10) NOT NULL REFERENCES patient,
   datetime_in TIMESTAMP NOT NULL,
   datetime_out TIMESTAMP NOT NULL,
-  doctor_id CHAR(10) REFERENCES doctor,
+  doctor_id CHAR(10) REFERENCES doctor CHECK,
   nurse_id CHAR(10) NOT NULL REFERENCES nurse,
                                         
   /* Whether or not the following six attributes are jotted down varies by
@@ -87,7 +87,12 @@ CREATE TABLE visit(
   sp_o2 DECIMAL(3, 2) CHECK(
 	  sp_o2 BETWEEN 0.00 AND 1.00
 		OR sp_o2 IS NULL),
-  PRIMARY KEY (patient_id, datetime_in));
+  PRIMARY KEY (patient_id, datetime_in),
+
+  /* This is an adult clinic, anything out of the two ranges below is a clear
+	   type-out */
+	height SMALLINT CHECK (height BETWEEN 100 AND 300),
+	weight SMALLINT CHECK (weight BETWEEN 50 AND 450);
   
 CREATE TABLE phone_number(
   id CHAR(10) NOT NULL references member,
@@ -109,7 +114,6 @@ CREATE TABLE email_address(
   PRIMARY KEY (id, email));
 
 /********************************CREATING VIEWS**********************************/
-
 
 
 /***********************************APPENDIX**************************************
