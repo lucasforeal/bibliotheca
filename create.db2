@@ -114,7 +114,23 @@ CREATE TABLE email_address(
   PRIMARY KEY (id, email));
 
 /********************************CREATING VIEWS**********************************/
+CREATE TRIGGER one_patient_at_a_time
+BEFORE INSERT ON visit
+REFERENCING NEW AS n
+FOR EACH ROW
 
+/* There cannot be two visits for different patients where the times overlap and
+   they they are seeing the same doctor */
+WHEN (EXISTS (
+  SELECT 1
+  FROM visit v
+  WHERE v.doctor_id = n.doctor_id
+    AND v.datetime_in <= n.datetime_out
+    AND n.datetime_in <= v.datetime_out
+    AND v.patient_id <> n.patient_id
+))
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'ERROR: DOCTOR CANNOT SEE BOTH PATIENTS SIMULTANEOUSLY';
 
 /***********************************APPENDIX**************************************
 Easy codes to categorize nurse.level_of_education:
