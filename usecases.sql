@@ -1,4 +1,4 @@
-Database Design Project--Part f: SQL Use Cases
+--Database Design Project--Part f: SQL Use Cases
 
 --Note in these statements, any id starting with a 1 is a patient, 2 is a doctor, 3 is a nurse, and 4 is a secretary
 
