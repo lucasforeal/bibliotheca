@@ -24,12 +24,7 @@ CREATE TABLE member(
 
 CREATE TABLE department(
   dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
-  head CHAR(10) REFERENCES member CHECK(
-
-  /* Ensure department head is not a patient */
-    head NOT IN (
-      SELECT DISTINCT patient_id
-      FROM patient)));
+  head CHAR(10) REFERENCES member);
 
 CREATE TABLE doctor(
   doctor_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
@@ -62,7 +57,7 @@ CREATE TABLE visit(
   patient_id CHAR (10) NOT NULL REFERENCES patient,
   datetime_in TIMESTAMP NOT NULL,
   datetime_out TIMESTAMP NOT NULL,
-  doctor_id CHAR(10) REFERENCES doctor CHECK,
+  doctor_id CHAR(10) NOT NULL REFERENCES doctor,
   nurse_id CHAR(10) NOT NULL REFERENCES nurse,
                                         
   /* Whether or not the following six attributes are jotted down varies by
@@ -92,7 +87,7 @@ CREATE TABLE visit(
   /* This is an adult clinic, anything out of the two ranges below is a clear
 	   type-out */
 	height SMALLINT CHECK (height BETWEEN 100 AND 300),
-	weight SMALLINT CHECK (weight BETWEEN 50 AND 450);
+	weight SMALLINT CHECK (weight BETWEEN 50 AND 450));
   
 CREATE TABLE phone_number(
   id CHAR(10) NOT NULL REFERENCES member,
@@ -118,7 +113,7 @@ CREATE TRIGGER one_patient_at_a_time
 BEFORE INSERT ON visit
 REFERENCING NEW AS n
 FOR EACH ROW
-
+ 
 /* There cannot be two visits for different patients where the times overlap and
    they they are seeing the same doctor */
 WHEN (EXISTS (
