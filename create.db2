@@ -23,30 +23,30 @@ CREATE TABLE member(
   zip CHAR(5) NOT NULL);
 
 CREATE TABLE department(
-  dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
-  head CHAR(10) REFERENCES member);
+  dept_name VARCHAR(25) NOT NULL PRIMARY KEY,
+  head CHAR(10) REFERENCES member ON DELETE SET NULL);
 
 CREATE TABLE doctor(
-  doctor_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
-  dept_name VARCHAR(25) NOT NULL REFERENCES department,
+  doctor_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member ON DELETE CASCADE,
   alma_mater VARCHAR(50),
+  dept_name VARCHAR(25) NOT NULL REFERENCES department ON DELETE CASCADE,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE nurse(
-  nurse_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
+  nurse_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member ON DELETE CASCADE,
   /* Refer to link at the bottom of this file for the level_of_education codes */
   level_of_education SMALLINT NOT NULL CHECK(level_of_education BETWEEN 0 AND 22),
-  dept_name VARCHAR(25) NOT NULL REFERENCES department,
+  dept_name VARCHAR(25) NOT NULL REFERENCES department ON DELETE CASCADE,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE secretary(
-  secretary_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
+  secretary_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member ON DELETE CASCADE,
   is_senior BOOLEAN NOT NULL,
-  dept_name VARCHAR(25) NOT NULL REFERENCES department,
+  dept_name VARCHAR(25) NOT NULL REFERENCES department ON DELETE CASCADE,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE patient(
-  patient_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
+  patient_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member ON DELETE CASCADE,
   /* Undocumented patients will have the SSN of 000-00-0000, hence this is not a
      candidate key by default for person_type. */
   ssn CHAR(9) NOT NULL,
@@ -54,15 +54,15 @@ CREATE TABLE patient(
     blood_group IN ('A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-')));
 
 CREATE TABLE visit(
-  patient_id CHAR (10) NOT NULL REFERENCES patient,
+  patient_id CHAR (10) NOT NULL REFERENCES patient ON DELETE CASCADE,
   datetime_in TIMESTAMP NOT NULL,
   datetime_out TIMESTAMP NOT NULL,
-  doctor_id CHAR(10) NOT NULL REFERENCES doctor,
-  nurse_id CHAR(10) NOT NULL REFERENCES nurse,
+  doctor_id CHAR(10) REFERENCES doctor ON DELETE SET NULL,
+  nurse_id CHAR(10) REFERENCES nurse ON DELETE SET NULL,
                                         
   /* Whether or not the following six attributes are jotted down varies by
      visit, and reason for visit, hence NULLs are welcome */
-  notes VARCHAR(30000),
+  notes VARCHAR(30),
 
   /* To save time typing  when using this database, the official abbreviations for
 	   the following have been used, respectively: systolic blood pressure,
@@ -90,7 +90,7 @@ CREATE TABLE visit(
 	weight SMALLINT CHECK (weight BETWEEN 50 AND 450));
   
 CREATE TABLE phone_number(
-  id CHAR(10) NOT NULL REFERENCES member,
+  id CHAR(10) NOT NULL REFERENCES member ON DELETE CASCADE,
   type VARCHAR(6) NOT NULL CHECK(
     type IN ('MOBILE', 'HOME', 'WORK', 'SCHOOL', 'MAIN')), 
   availability VARCHAR(10) CHECK(
@@ -100,7 +100,7 @@ CREATE TABLE phone_number(
   PRIMARY KEY (id, number));
 	
 CREATE TABLE email_address(  
-  id CHAR(10) NOT NULL REFERENCES member,
+  id CHAR(10) NOT NULL REFERENCES member ON DELETE CASCADE,
   email VARCHAR(345) NOT NULL CHECK(
   
   /* This will ensure that emails have at least one character before the "@,"
