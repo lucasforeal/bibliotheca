@@ -24,13 +24,12 @@ CREATE TABLE member(
 
 CREATE TABLE department(
   dept_name VARCHAR(10) NOT NULL PRIMARY KEY,
-  head CHAR(10) references member);
-	-- ^ Not sure how to implement head:
-  -- (1) It should be an FK to an employee's ID, such that if the
-  --     employee is fired, then the department.head entry is
-  --     deleted
-  -- (2) It has the same issue as phone_number.id and
-  --     email_address.id*
+  head CHAR(10) REFERENCES member CHECK(
+
+  /* Ensure department head is not a patient */
+    head NOT IN (
+      SELECT DISTINCT patient_id
+      FROM patient);
 
 CREATE TABLE doctor(
   doctor_id CHAR(10) NOT NULL PRIMARY KEY references member,
@@ -117,8 +116,8 @@ CREATE VIEW patient_view AS(
   SELECT *
 	FROM patient as p JOIN visit as v
 	ON p.patient_id = v.patient_id
-	WHERE patient_id = CURRENT USER);
-
+	WHERE p.patient_id = CURRENT USER);
+  
 
 
 /***********************************APPENDIX**************************************
