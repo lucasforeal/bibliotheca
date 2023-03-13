@@ -32,26 +32,26 @@ CREATE TABLE department(
       FROM patient)));
 
 CREATE TABLE doctor(
-  doctor_id CHAR(10) NOT NULL PRIMARY KEY references member,
+  doctor_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   alma_mater VARCHAR(50),
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE nurse(
-  nurse_id CHAR(10) NOT NULL PRIMARY KEY references member,
+  nurse_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
   /* Refer to link at the bottom of this file for the level_of_education codes */
   level_of_education SMALLINT NOT NULL CHECK(level_of_education BETWEEN 0 AND 22),
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE secretary(
-  secretary_id CHAR(10) NOT NULL PRIMARY KEY references member,
+  secretary_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
   is_senior BOOLEAN NOT NULL,
   dept_name VARCHAR(25) NOT NULL REFERENCES department,
   ssn CHAR(9) NOT NULL UNIQUE);
   
 CREATE TABLE patient(
-  patient_id CHAR(10) NOT NULL PRIMARY KEY references member,
+  patient_id CHAR(10) NOT NULL PRIMARY KEY REFERENCES member,
   /* Undocumented patients will have the SSN of 000-00-0000, hence this is not a
      candidate key by default for person_type. */
   ssn CHAR(9) NOT NULL,
@@ -90,7 +90,7 @@ CREATE TABLE visit(
   PRIMARY KEY (patient_id, datetime_in));
   
 CREATE TABLE phone_number(
-  id CHAR(10) NOT NULL references member,
+  id CHAR(10) NOT NULL REFERENCES member,
   type VARCHAR(6) NOT NULL CHECK(
     type IN ('MOBILE', 'HOME', 'WORK', 'SCHOOL', 'MAIN')), 
   availability VARCHAR(10) CHECK(
@@ -100,7 +100,7 @@ CREATE TABLE phone_number(
   PRIMARY KEY (id, number));
 	
 CREATE TABLE email_address(  
-  id CHAR(10) NOT NULL references member,
+  id CHAR(10) NOT NULL REFERENCES member,
   email VARCHAR(345) NOT NULL CHECK(
   
   /* This will ensure that emails have at least one character before the "@,"
