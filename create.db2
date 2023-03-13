@@ -108,15 +108,23 @@ CREATE TABLE email_address(
     email LIKE '%_@__%.__%'),
   PRIMARY KEY (id, email));
 
-/********************************CREATING VIEWS**********************************/
+/********************************CREATING VIEWS***********************************
+We can think of many different view restrictions for a hospital database, but
+since we were not asked to list such as non-functional requirements back in
+assignment one, we will only incorporate the non-functional requirements there
+(which are enough for the scope of this project). The only view mentioned there is
+NF requirement D, which among the triggers below will be the only view
+Implemented. NF Requirements C and F, however, will not be implemented, since we
+are no longer keeping track of rooms, and money, per feedback */
+
 CREATE TRIGGER one_patient_at_a_time
 BEFORE INSERT ON visit
 REFERENCING NEW AS n
 FOR EACH ROW
- 
+
 /* There cannot be two visits for different patients where the times overlap and
    they they are seeing the same doctor */
-WHEN (EXISTS (
+WHEN(EXISTS(
   SELECT 1
   FROM visit v
   WHERE v.doctor_id = n.doctor_id
@@ -126,6 +134,65 @@ WHEN (EXISTS (
 ))
 SIGNAL SQLSTATE '45000'
 SET MESSAGE_TEXT = 'ERROR: DOCTOR CANNOT SEE BOTH PATIENTS SIMULTANEOUSLY';
+
+CREATE TRIGGER no_workaholic_doctors
+BEFORE INSERT ON VISIT
+REFERENCING NEW AS n
+FOR EACH ROW
+
+/* Insert visit only thrives if its length plus the number of total hours its
+   doctor has already worked this week number (ISO), this year, is lesser than 40
+	 */
+WHEN(
+   40 < HOUR(n.datetime_in - n.datetime_out) +
+          (SELECT SUM(HOUR(datetime_out - datetime_in)) AS total_week_hours
+	  FROM visit
+	  WHERE doctor_id = n.doctor_id
+	    AND YEAR(n.datetime_in) = YEAR(datetime_in)
+      AND WEEK_ISO(n.datetime_in) = WEEK_ISO(datetime_in)
+	  GROUP BY datetime_in))
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'ERROR: DOCTORS CANNOT GO OVER 40-HOUR-WEEKS';
+
+/* Merely just a subset of the views we could implement, if this was a bigger
+   project */
+CREATE VIEW medical_secretary_insertable_view_on_visit AS
+SELECT patient_id, datetime_in, datetime_out, doctor_id, nurse_id
+FROM visit;
+
+CREATE TRIGGER no_same_day_appointments
+BEFORE INSERT ON visit
+REFERENCING NEW AS n
+FOR EACH ROW
+WHEN(EXISTS(
+  SELECT 1
+	FROM visit
+	WHERE DATE(n.datetime_in) IN(
+	  SELECT DATE(datetime_in)
+		FROM visit)))
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'ERROR: NO SAME-DAY APPOINTMENTS';
+
+CREATE TRIGGER no_minors
+BEFORE UPDATE ON department
+REFERENCING NEW AS n
+FOR EACH ROW
+WHEN(YEAR(CURRENT DATE - n.dob) < 18)
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'ERROR: THIS IS AN ADULT-ONLY MEDICAL CENTER';
+
+/* Note how this is (1) an update trigger, not an insert one, and (2) how this is
+   a requirement not origally in our non-functional requirements document */
+CREATE TRIGGER patients_cannot_be_dept_head
+BEFORE INSERT ON department
+REFERENCING NEW AS n
+FOR EACH ROW
+WHEN(
+  n.head IN(
+  	SELECT DISTINCT patient_id
+	  FROM patient))
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'ERROR: PATIENTS CANNOT BE DEPARTMENT HEAD';
 
 /***********************************APPENDIX**************************************
 Easy codes to categorize nurse.level_of_education:
