@@ -31,9 +31,10 @@ insert into member values('3333333333', 'John', 'Swing', 'Mayer', 'M', '9-1-1986
 insert into nurse values('3333333333', 13, 'general-nurse', '938135689');
 
 --Update/Edit nurse (example--one of many possible updates)
-update member
-  set first_name = 'Jonnhy'
-  where id = '3333333333';
+update nurse 
+  set level_of_education = '14' 
+  where nurse_id = '3333333333';
+
 
 --Add doctor (note that two inserts are needed for the separate tables)
 insert into member values('2222222222', 'Lizzy', 'Grace', 'McAlpine', 'F', '2-5-1996', '123 Doomsday rd', 'Indietown', 'AL', '00093');
@@ -41,20 +42,25 @@ insert into member values('2222222222', 'Lizzy', 'Grace', 'McAlpine', 'F', '2-5-
 insert into doctor values('2222222222', 'Gordon Conwell', 'spleen-specialist', '935038789');
 
 --Update/Edit doctor (example--one of many possible updates)
-update member
-  set first_name = 'Rachel'
-  where id = '2222222222';
+update doctor 
+  set dept_name = 'general-nurse' 
+  where doctor_id = '2222222222';
+
 
 --Testing the add visit use case
 insert into visit values('1111111111','2023-03-12 12:00:00', '2023-03-12 13:00:00', '2222222222', '3333333333', 'no note', 10, 12, 101, 76, 0.5, 150, 55);
+insert into visit values('1111111111','2023-04-13 12:00:00', '2023-04-13 13:00:00', '2222222222', '3333333333', 'no note', 11, 12, 111, 77, 0.5, 150, 55);
+
 
 --Access visit info
-select *
-from visit;
---optionally add where id = 'someID' AND datetime_in = 'someDateTime' if you want a
-     --particular instance of a visit
+--Access all visit info
+select * from visit;
+--Add where id = 'someID' AND datetime_in = 'someDateTime' if you want a
+--particular instance of a visit
+select * from visit where patient_id = '1111111111' AND datetime_in = '2023-03-12 12:00:00';
 
---Take notes use case for Doctor/Nurse
+
+--Take notes use case for Doctor/Nurse (part of update visit use case)
 update visit
   set notes = 'someNotes'
   where patient_id = '1111111111' AND datetime_in = '2023-03-12 12:00:00';
@@ -83,22 +89,35 @@ delete from member where id = '4444444444';
 
 --Access patient info
 select *
-from member JOIN patient ON id = patient_id;
+  from member JOIN patient ON id = patient_id;
 --optionally add where id = 'someID' if you want a particular patient
 
 --Access doctor info
 select *
-from member JOIN doctor ON id = doctor_id;
+  from member JOIN doctor ON id = doctor_id;
 --optionally add where id = 'someID' if you want a particular doctor
-
 
 
 --Access nurse info
 select *
-from member JOIN nurse ON id = nurse_id;
+  from member JOIN nurse ON id = nurse_id;
 --optionally add where id = 'someID' if you want a particular nurse
 
 --Access secretary info
 select *
 from member JOIN secretary ON id = secretary_id;
 --optionally add where id = 'someID' if you want a particular secretary
+
+--Print List of Patients:
+select * from patient;
+
+
+--Print List of Doctors:
+Select * from doctor;
+
+--Print List of Nurses:
+Select * from nurse;
+
+--Print List of Secretaries:
+Select * from secretary;
+
